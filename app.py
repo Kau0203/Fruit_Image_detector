@@ -1,40 +1,42 @@
 import streamlit as st
 from PIL import Image
-import torch
+from ultralytics import YOLO
+import tempfile
+import os
 
-# Load your model
-model = torch.hub.load('ultralytics/yolov5', 'custom', path='best.pt')
+st.set_page_config(page_title="Fruit Detection 🍓", layout="centered")
 
-# ----------------- BACKGROUND IMAGE -----------------
-def set_background(image_url):
-    page_bg = f"""
-    <style>
-    .stApp {{
-        background: url("https://img.freepik.com/free-vector/hand-drawn-fruits-vegetables-pattern-background_23-2150855720.jpg?semt=ais_hybrid&w=740&q=80");
-        background-size: cover;
-    }}
-    </style>
-    """
-    st.markdown(page_bg, unsafe_allow_html=True)
+def set_bg():
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("https://plus.unsplash.com/premium_photo-1671379086152-0effad2b1e09?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+            background-size: cover;
+            background-position: center;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-# ---------- ADD YOUR BACKGROUND IMAGE URL HERE ----------
-BACKGROUND_IMAGE_URL = "https://your-image-link.com/image.jpg"
-set_background(BACKGROUND_IMAGE_URL)
-# ---------------------------------------------------------
+set_bg()
+st.title("🍎 Fruit Detection App")
+st.write("Upload a fruit image to detect fruit names using YOLOv11.")
 
-st.title("Fruit Image Classification")
+model = YOLO("best.pt")
 
-uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Upload your fruit image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
-    image = Image.open(uploaded_file)
+    image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Run model
-    results = model(image)
-    results.render()
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp:
+        image.save(temp.name)
+        results = model(temp.name, save=True, project="runs", name="detect")
 
-    st.image(results.ims[0], caption="Prediction", use_column_width=True)
-
-    # Show labels
-    st.write("Detected:", results.pandas().xyxy[0])
+    for r in results:
+        st.image(r.plot(), caption="Prediction", use_column_width=True)
+        fruit_names = list(set([model.names[int(c)] for c in r.boxes.cls]))
+        st.success("✅ Detected: " + ", ".join(fruit_names))
