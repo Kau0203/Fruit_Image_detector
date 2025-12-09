@@ -1,0 +1,20 @@
+Select roboflow dataset with yolo11/yolo8
+
+Train and test the model
+
+Download best.pt file 
+
+then create app.py, requirment.txt 
+
+All required files upload on github
+
+Used gitbash to get clone of that files. 
+
+Open that folder on vs code. 
+
+Turn on terminal and run "python -m venv fruit_venv" to create environmnet.
+
+"pip instal -r.\requirements.txt" to download reuirements. 
+
+To run app install "python -m streamlit run app.py" or "streamlit run app.py"
+  
