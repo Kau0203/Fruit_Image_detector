@@ -68,6 +68,6 @@ Tempfile (for handling uploaded images)
 
 Develop by :
 
-Name: vishal pate
+Name: kaumudi gavkhadkar 
 
-Email: vprakashpate@gmail.com
+Email: kaumudigavkhadkar275@gmail.com
